@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banco De Transferências</title>
+  <style>
+ body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+  text-align: center;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+form {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
+  width: calc(100% - 16px); 
+  padding: 10px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input[type="submit"], button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover, button:hover {
+  background-color: #45a049;
+}
+
+#sucessoContainer {
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+  <div id="loginContainer">
+    <form id="loginForm" onsubmit="return validarForm()">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="senha">Senha:</label>
+      <input type="password" id="senha" name="senha" required>
+
+      <input type="submit" value="Entrar">
+    </form>
+  </div>
+
+  <div id="sucessoContainer" style="display: none;">
+    <div class="container">
+      <h1>Área de Sucesso</h1>
+
+      <h2>Informações do Usuário</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome do Usuário</th>
+            <th>Email</th>
+            <th>Saldo do Usuário</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaUsuarios">
+        </tbody>
+      </table>
+
+      <h2>Transferência</h2>
+      <form id="formTransferencia" onsubmit="return transferir()">
+        <label for="destinatario">Destinatário:</label>
+        <input type="text" id="destinatario" name="destinatario" required>
+        <label for="valor">Valor:</label>
+        <input type="number" id="valor" name="valor" required>
+        <button type="submit">Transferir</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var usuarios = {
+      "jao@gmail.com": {
+        nome: "João",
+        senha: "senha1",
+        saldo: 1000
+      },
+      "kaio@gmail.com": {
+        nome: "Kaio",
+        senha: "senha2",
+        saldo: 1500
+      }
+    };
+
+    function validarForm() {
+      var email = document.getElementById('email').value;
+      var senha = document.getElementById('senha').value;
+
+      if (usuarios.hasOwnProperty(email) && usuarios[email].senha === senha) {
+        exibirInformacoesUsuario(email);
+        return false;
+      } else {
+        alert('Email ou senha incorretos. Acesso negado.');
+        return false;
+      }
+    }
+
+    function exibirInformacoesUsuario(email) {
+      var usuario = usuarios[email];
+      document.getElementById("sucessoContainer").style.display = "block";
+      document.getElementById("loginContainer").style.display = "none";
+      document.getElementById("tabelaUsuarios").innerHTML = `
+        <tr>
+          <td>${usuario.nome}</td>
+          <td>${email}</td>
+          <td>${usuario.saldo}</td>
+        </tr>
+      `;
+    }
+
+    function transferir() {
+  var remetenteEmail = document.getElementById('email').value.trim();
+  var destinatarioEmail = document.getElementById('destinatario').value.trim();
+  var valor = parseInt(document.getElementById('valor').value);
+
+  if (!usuarios.hasOwnProperty(destinatarioEmail)) {
+    alert('Destinatário não encontrado.');
+    return false;
+  }
+
+  var remetente = usuarios[remetenteEmail];
+  var destinatario = usuarios[destinatarioEmail];
+
+  if (remetente.saldo < valor) {
+    alert('Saldo insuficiente para transferência.');
+    return false;
+  }
+
+  remetente.saldo -= valor;
+  destinatario.saldo += valor;
+
+  exibirInformacoesUsuario(remetenteEmail);
+  exibirInformacoesUsuario(destinatarioEmail);
+
+  return false;
+}
+
+  </script>
+</body>
+</html>
